@@ -33,3 +33,27 @@ void IO::FileManager::readSavedSquares() {
     else { cout << "'SavedSquaresPositions.txt' file does not exist, unable to load saved squares." << endl; }
 }
 
+void IO::FileManager::saveSquares() {
+    try {
+        ofstream SavedSquares("data/SavedSquaresPositions.txt");
+
+        if (SavedSquares.is_open()) {
+
+            SavedSquares << GraphicsValues::CVSquares::Squares.size() << endl;
+
+            for (int i = 0; i < GraphicsValues::CVSquares::Squares.size(); i++) {
+
+                SavedSquares << GraphicsValues::CVSquares::Squares[i].TL.x << endl;
+                SavedSquares << GraphicsValues::CVSquares::Squares[i].TL.y << endl;
+                SavedSquares << GraphicsValues::CVSquares::Squares[i].KEY << endl;
+                SavedSquares << GraphicsValues::CVSquares::Squares[i].DISPLAYKEY << endl;
+            }
+
+            SavedSquares.close();
+        }
+    }
+    catch (const exception& e) {
+        cerr << "The program could not save properly to SavedSquaresPositions.txt, the program returned the following error: " << e.what() << endl;
+    }
+}
+
