@@ -186,7 +186,7 @@ void IO::UserInput::onMouse(int event, int x, int y, int flags, void* userdata) 
                             IO::FileManager::saveSquares();
                         }
                         catch (const exception& e) {
-                            cerr << "Nao foi possivel remover o quadrado selecionado, o metodo erase retornou o seguinte erro: " << e.what() << endl;
+                            cerr << "it was not possible select the square, the method 'erase' returned it: " << e.what() << endl;
                         }
                     }
                 }
@@ -226,5 +226,76 @@ void IO::UserInput::CustomElementsOnWindow() {
     }
     catch (const exception& e) {
         cerr << "It was not possible to custom the jump line height, the program returned the following error: " << e.what() << endl;
+    }
+}
+
+void IO::UserInput::CustomElementsOnWindow(unsigned selectedSquare, IO::FileManager& fileManager) {
+        try {
+        int keyPressed = waitKeyEx(10);
+
+        for (auto& square : GraphicsValues::CVSquares::Squares) {
+            if (square.ID == selectedSquare) {
+
+                // Move selected square left
+                if (keyPressed == 2424832 && square.TL.x > 5) {
+
+                    square.TL.x -= 5;
+
+                    square.BR = Point(square.TL.x + 80, square.TL.y + 100);
+                }
+                // Move selected square up
+                if (keyPressed == 2490368 && square.TL.y > 5) {
+
+                    square.TL.y -= 5;
+
+                    square.BR = Point(square.TL.x + 80, square.TL.y + 100);
+                }
+                // Move selected square right
+                if (keyPressed == 2555904 && square.BR.x + 5 < GraphicsValues::CVMatFrames::imgFlip.size().width) {
+
+                    square.TL.x += 5;
+
+                    square.BR = Point(square.TL.x + 80, square.TL.y + 100);
+                }
+                // Move selected square down
+                if (keyPressed == 2621440 && square.BR.y + 5 < GraphicsValues::CVMatFrames::imgFlip.size().height) {
+
+                    square.TL.y += 5;
+
+                    square.BR = Point(square.TL.x + 80, square.TL.y + 100);
+                }
+
+                // Assign key bind to the selected square
+                if (MapKeys::keyMap.find(static_cast<char>(keyPressed)) != MapKeys::keyMap.end()) {
+
+                    square.KEY = MapKeys::keyMap[static_cast<char>(keyPressed)];
+
+                    square.DISPLAYKEY = std::string(1, toupper(static_cast<char>(keyPressed)));
+                }
+                // Special keys
+                else {
+                    // keyPressed for special keys (like SPACE, TAB) should be looked up as an int
+                    auto itEx = MapKeys::keyMapEX.find(keyPressed);
+                    if (itEx != MapKeys::keyMapEX.end()) {
+                        square.KEY = itEx->second;
+
+                        auto itName = MapKeys::keyEXName.find(keyPressed);
+                        if (itName != MapKeys::keyEXName.end()) {
+                            square.DISPLAYKEY = itName->second;
+                        }
+                        else {
+                            square.DISPLAYKEY = std::to_string(keyPressed);
+                        }
+                    }
+                }
+
+                fileManager.saveSquares();
+
+                break;
+            }
+        }
+    }
+    catch (const exception& e) {
+        cerr << "It was not possible to custom the selected square, the program returned the following error: " << e.what() << endl;
     }
 }
