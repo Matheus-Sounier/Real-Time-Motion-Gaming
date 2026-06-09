@@ -57,3 +57,48 @@ void IO::FileManager::saveSquares() {
     }
 }
 
+void IO::FileManager::readTolerance() {
+    ifstream MoveTOLERANCE;
+    MoveTOLERANCE.open("data/DetectionTolerance.txt");
+
+    if (MoveTOLERANCE.is_open()) {
+        MoveTOLERANCE >> GraphicsValues::TOLERANCE;
+        cout << "The tolerance value was loaded successfully" << endl;
+        MoveTOLERANCE.close();
+    }
+    else { cout << "'DetectionTolerance.txt' file does not exist, unable to load saved tolerance, using the default value." << endl; }
+}
+
+void IO::UserInput::DisplayInstructions() {
+
+        cout << endl << "USAGE:" << endl;
+        cout << endl << "HOW TO CREATE A SQUARE:" << endl
+            << "- Double-click with the left mouse button to add a detection square at the clicked location." << endl;
+        cout << endl << "HOW TO BIND A KEY:" << endl
+            << "- Click on a square to select it." << endl
+            << "- Press a key to bind it to the selected square." << endl;
+        cout << endl << "HOW TO MOVE A SQUARE:" << endl
+            << "- Click on a square to select it." << endl
+            << "- Use arrow keys to move the square within the window." << endl;
+        cout << endl << "HOW TO REMOVE A SQUARE:" << endl
+            << "- Click on a square to select it." << endl
+            << "- Right-click on a square to remove it." << endl;
+        cout << endl << "Enable jump detection? (send 'yes' or 'no')" << endl;
+    //}
+}
+
+bool IO::UserInput::activateJumpDetection() {
+    string JumpDetectionINPUT;
+
+    cin >> JumpDetectionINPUT;
+
+    if (JumpDetectionINPUT == "yes") {
+
+        cout << endl << ">> Jump Detection ON\n\n\n\n" << endl;
+
+        return true;
+    }
+    
+    cout << endl << ">> Jump Detection OFF\n\n\n\n" << endl;
+    return false;
+}
