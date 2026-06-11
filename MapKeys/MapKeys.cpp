@@ -41,3 +41,35 @@ std::unordered_map<char, int> MapKeys::keyMap = {
     {'8', 0x38},
     {'9', 0x39},
 };
+
+// Extended key map
+std::unordered_map<int, int> MapKeys::keyMapEX = {
+    {9, VK_TAB},
+    {8, VK_BACK},
+    {32, VK_SPACE},
+};
+
+// Extended key names
+std::unordered_map<int, std::string> MapKeys::keyEXName = {
+    {9, "TAB"},
+    {8, "BACK"},
+    {32, "SPACE"},
+};
+
+void MapKeys::PressKey(int key)
+{
+    INPUT input{};
+    input.type = INPUT_KEYBOARD;
+    input.ki.wVk = static_cast<WORD>(key);
+    input.ki.dwFlags = 0;
+    SendInput(1, &input, sizeof(INPUT));
+}
+
+void MapKeys::ReleaseKey(int key)
+{
+    INPUT input{};
+    input.type = INPUT_KEYBOARD;
+    input.ki.wVk = static_cast<WORD>(key);
+    input.ki.dwFlags = KEYEVENTF_KEYUP;
+    SendInput(1, &input, sizeof(INPUT));
+}
