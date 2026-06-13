@@ -285,3 +285,21 @@ void Graphics::ImageManager::preprocessImage(Mat imgFlip) {
         cerr << "OpenCV could not process the image properly, the program returned the following error: " << e.what() << endl;
     }
 }
+
+// Draw squares
+void Graphics::ImageManager::drawSquares(Mat imgFlip) {
+    try {
+        if (GraphicsValues::CVSquares::Squares.size() != 0) {
+
+            for (int i = 0; i < GraphicsValues::CVSquares::Squares.size(); i++) {
+
+                Scalar SquareCOLOR = GraphicsValues::CVSquares::Squares[i].COLOR;
+
+                rectangle(imgFlip, GraphicsValues::CVSquares::Squares[i].TL, GraphicsValues::CVSquares::Squares[i].BR, SquareCOLOR, 3);
+            }
+        }
+    }
+    catch (const exception& e) {
+        cerr << "It was not possible to draw the squares properly, the program returned the following error: " << e.what() << endl;
+    }
+}
