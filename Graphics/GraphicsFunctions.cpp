@@ -76,3 +76,83 @@ void Graphics::ImageManager::resizeJumpArea() {
         cerr << "It was not possible to resize the jump detection image, the program returned the following error: " << e.what() << endl;
     }
 }
+
+void Graphics::ImageManager::drawJumpLine(Mat imgFlip) {
+    try {
+        if (GraphicsValues::CVJumpLine::Lines.size() == 0) {
+
+            GraphicsValues::CVJumpLine::Line new_jumpline;
+            new_jumpline.Position = Point(0, 120);
+            new_jumpline.COLOR = Scalar(255, 255, 255); // BGR FORMAT
+            new_jumpline.SELECTED = false;
+
+            GraphicsValues::CVJumpLine::Lines.push_back(new_jumpline);
+        }
+
+        if (GraphicsValues::CVJumpLine::Lines[0].SELECTED == true) {
+
+            GraphicsValues::CVJumpLine::Lines[0].COLOR = Scalar(255, 0, 0); // BGR FORMAT
+        }
+        if (GraphicsValues::CVJumpLine::Lines[0].SELECTED == false) {
+
+            GraphicsValues::CVJumpLine::Lines[0].COLOR = Scalar(255, 255, 255); // BGR FORMAT
+        }
+
+        line(imgFlip, GraphicsValues::CVJumpLine::Lines[0].Position, Point(imgFlip.size().width, GraphicsValues::CVJumpLine::Lines[0].Position.y), GraphicsValues::CVJumpLine::Lines[0].COLOR, 1.5);
+
+        GraphicsValues::CVJumpLine::LineExists = true;
+
+        try {
+            const int barWidth = 300;
+            const int barHeight = 18;
+            int x = 20;
+            int y = imgFlip.size().height - 40;
+
+            if (DetectionValues::chargingJump) {
+                int durationSoFar = DetectionValues::currentChargingMs;
+                // background
+                rectangle(imgFlip, Point(x, y), Point(x + barWidth, y + barHeight), Scalar(50, 50, 50), cv::FILLED);
+                // compute fraction using same clamps
+                const int MIN_POWER = 50;
+                const int MAX_POWER = 800;
+                int clamped = durationSoFar;
+                if (clamped < MIN_POWER) clamped = MIN_POWER;
+                else if (clamped > MAX_POWER) clamped = MAX_POWER;
+                float frac = (float)(clamped - MIN_POWER) / (float)(MAX_POWER - MIN_POWER);
+                rectangle(imgFlip, Point(x + 2, y + 2), Point(x + 2 + static_cast<int>((barWidth - 4) * frac), y + barHeight - 2), Scalar(0, 255, 255), cv::FILLED);
+                rectangle(imgFlip, Point(x, y), Point(x + barWidth, y + barHeight), Scalar(200, 200, 200), 1);
+                char buf[64];
+                snprintf(buf, sizeof(buf), "Charging: %d ms", durationSoFar);
+                putText(imgFlip, buf, Point(x, y - 8), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(220, 220, 220), 1);
+            }
+            else if (DetectionValues::jumpStored) {
+                // show stored power
+                int stored = DetectionValues::storedJumpPower;
+                // background
+                rectangle(imgFlip, Point(x, y), Point(x + barWidth, y + barHeight), Scalar(40, 40, 40), cv::FILLED);
+                const int MIN_POWER = 50;
+                const int MAX_POWER = 800;
+                int clamped = stored;
+                if (clamped < MIN_POWER) clamped = MIN_POWER;
+                else if (clamped > MAX_POWER) clamped = MAX_POWER;
+                float frac = (float)(clamped - MIN_POWER) / (float)(MAX_POWER - MIN_POWER);
+                rectangle(imgFlip, Point(x + 2, y + 2), Point(x + 2 + static_cast<int>((barWidth - 4) * frac), y + barHeight - 2), Scalar(180, 180, 0), cv::FILLED);
+                rectangle(imgFlip, Point(x, y), Point(x + barWidth, y + barHeight), Scalar(200, 200, 200), 1);
+                char buf[64];
+                snprintf(buf, sizeof(buf), "Stored: %d ms", stored);
+                putText(imgFlip, buf, Point(x, y - 8), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(220, 220, 220), 1);
+                // indicate waiting for direction
+                putText(imgFlip, "Select direction", Point(x + barWidth + 10, y + barHeight - 2), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(200, 200, 200), 1);
+            }
+            else if (DetectionValues::executingJump) {
+                putText(imgFlip, "Executing jump...", Point(x, y - 8), FONT_HERSHEY_SIMPLEX, 0.6, Scalar(180, 200, 255), 1);
+            }
+        }
+        catch (...) {
+            // ignore
+        }
+    }
+    catch (const exception& e) {
+        cerr << "It was not possible to draw the jump line, the program returned the following error: " << e.what() << endl;
+    }
+}
